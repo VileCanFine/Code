@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>Real-Life Among Us</title>
+    <style>
+        .full-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30em;
+            background: #11191f; /* Adjusted to match the blue background */
+            z-index: 1000;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+    </style>
+    <script>
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(frequency, type) {
+            var oscillator = audioCtx.createOscillator();
+            var gainNode = audioCtx.createGain();
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            gainNode.gain.value = 0.2; // Reduced volume
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 1); // Play for 1 second
+        }
+
+        function checkSequence() {
+            var sequence = document.getElementById('sequence').value;
+            var resultElement = document.createElement('div');
+            resultElement.id = 'full-screen-result';
+            if (sequence === '1234') {
+                resultElement.innerHTML = '&#10004;';
+                resultElement.classList.add('full-screen', 'correct');
+                playSound(520, 'sine'); // Correct sound
+            } else {
+                resultElement.innerHTML = '&#10008;';
+                resultElement.classList.add('full-screen', 'incorrect');
+                playSound(110, 'sawtooth'); // Incorrect sound
+            }
+            document.body.appendChild(resultElement);
+            setTimeout(function() {
+                document.body.removeChild(resultElement);
+                document.getElementById('sequence').value = ''; // Reset the text field
+            }, 3000);
+        }
+    </script>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong></strong></li>
+        </ul>
+        <ul></ul>
+    </nav>
+    <main class="container">
+        <div class="grid">
+            <section>
+                <hgroup>
+                    <h2>KOODIN VAHVISTUS</h2>
+                    <h3>Syötä oikea koodi</h3>
+                </hgroup>
+                <input type="text" id="sequence" placeholder="Syötä numerot" aria-label="Number sequence" required />
+                <button onclick="checkSequence()">TARKISTA</button>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
